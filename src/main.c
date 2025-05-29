@@ -90,6 +90,20 @@ void UpdateTeclado() {
     }
 
 }
+void deletebody(int tableY, int tableX, int cellSize){
+     for (int i = 0; i < TABLE_HEIGHT; i++)
+        {
+            // Dibujar cada celda
+            for (int j = 0; j < TABLE_WIDTH; j++)
+            {
+                if(table[i][j]==0){
+                    float centerX = tableX + j*cellSize + cellSize / 2;
+                    float centerY = tableY + i*cellSize + cellSize / 2;
+                    DrawCircle(centerX, centerY, 12, BLACK);
+                }
+            }
+        }
+}
 
 int main(int argc, char const *argv[])
 {
@@ -98,6 +112,10 @@ int main(int argc, char const *argv[])
     const int SCREENWIDTH = 1245;
     const int SCREENHEIGHT = 800;
     const int cellSize = 50;
+    // Probando borrar el cuerpo cada 0,5 segundos
+    float timerB = 0.0f;
+    
+    
     inicializar(&body);
 
     InitWindow(SCREENWIDTH, SCREENHEIGHT, "SNAKERSSSSSS");
@@ -106,9 +124,11 @@ int main(int argc, char const *argv[])
     
     while (!WindowShouldClose())
     {
+        
         BeginDrawing();
         ClearBackground(BLACK);
-
+        float erasedbody = GetFrameTime();
+        timerB += erasedbody;
         // Generacion aleatoria de comida
         if(!food){
             fX = rand() % 10;
@@ -151,16 +171,19 @@ int main(int argc, char const *argv[])
                     float centerY = tableY + i*cellSize + cellSize / 2;
                     DrawCircle(centerX, centerY, 12, RED);
                 }
-                
-               
             }
+            if (timerB >=0.5f)
+            {
+                deletebody(tableY, tableX, cellSize);
+                timerB = 0.0f;
+            }
+            
             DrawBody();
             // Puntaje en pantalla
-            printf("Size actual: %d\n", tamanio(&body));
             char t[64];
             sprintf(t, "POINTS: %d", FCont);
             DrawText(t, 100, 100, 30, GREEN);   
-
+            
             //Lineas de ejes
             //DrawLine(SCREENWIDTH / 2, 0, SCREENWIDTH / 2, SCREENHEIGHT, RED);
             //DrawLine(0, SCREENHEIGHT / 2, SCREENWIDTH, SCREENHEIGHT / 2, RED);
