@@ -7,9 +7,17 @@
 #define TABLE_WIDTH 10
 #define TABLE_HEIGHT 10
 
+enum Movement {
+    CurrentUP = 1,
+    CurrentDown = 2,
+    CurrentLeft = 3,
+    CurrentRight = 4 
+};
+
 int table[TABLE_WIDTH][TABLE_HEIGHT] = {0};
 int cOriginY = 0, cOriginX = 0;
 int FCont=0;
+int actualMovement;
 //Comida de la serpiente
 int fY, fX;
 bool food = false;
@@ -27,66 +35,73 @@ void DrawBody(){
 void UpdateTeclado() {
     if (IsKeyPressed(KEY_DOWN))
     {
-        if(cOriginY+1 < TABLE_HEIGHT){
-            table[cOriginY][cOriginX]= 0;
-            cOriginY++;
-            if(table[cOriginY][cOriginX]==2)
-            {
-                apilar(&body, cOriginX, cOriginY-1);
+        actualMovement=2;
+        // if(cOriginY+1 < TABLE_HEIGHT && actualMovement != 2){
+        //     actualMovement = 2;
+        //     table[cOriginY][cOriginX]= 0;
+        //     cOriginY++;
+        //     if(table[cOriginY][cOriginX]==2)
+        //     {
+        //         apilar(&body, cOriginX, cOriginY-1);
             
-                FCont++;
-                food=false;
+        //         FCont++;
+        //         food=false;
                     
-            }
-            table[cOriginY][cOriginX]= 1;
-        }
+        //     }
+        //     table[cOriginY][cOriginX]= 1;
+        // }
     } 
     if (IsKeyPressed(KEY_UP)){
-        if(cOriginY - 1 >= 0){
-            table[cOriginY][cOriginX]= 0;
-            cOriginY--;
-            if(table[cOriginY][cOriginX]==2)
-            {
-                apilar(&body,cOriginX,cOriginY+1);
-                FCont++;
-                food=false;       
-            }
-            table[cOriginY][cOriginX]= 1;
+        actualMovement=1;
+        // if(cOriginY - 1 >= 0 && actualMovement != 1){
+        //     actualMovement = 1;
+        //     table[cOriginY][cOriginX]= 0;
+        //     cOriginY--;
+        //     if(table[cOriginY][cOriginX]==2)
+        //     {
+        //         apilar(&body,cOriginX,cOriginY+1);
+        //         FCont++;
+        //         food=false;       
+        //     }
+        //     table[cOriginY][cOriginX]= 1;
         
-        }
+        // }
     }
     if (IsKeyPressed(KEY_RIGHT)){
-        if (cOriginX+1 < TABLE_WIDTH)
-        {
-            table[cOriginY][cOriginX]= 0;
-            cOriginX++;
-            if(table[cOriginY][cOriginX]==2)
-            {
-                apilar(&body,cOriginX-1,cOriginY);
-                FCont++;
-                food=false;
+        actualMovement=4;
+        // if (cOriginX+1 < TABLE_WIDTH && actualMovement != 4)
+        // {
+        //     actualMovement = 4;
+        //     table[cOriginY][cOriginX]= 0;
+        //     cOriginX++;
+        //     if(table[cOriginY][cOriginX]==2)
+        //     {
+        //         apilar(&body,cOriginX-1,cOriginY);
+        //         FCont++;
+        //         food=false;
                     
-            }
-            table[cOriginY][cOriginX]= 1;
-        }
+        //     }
+        //     table[cOriginY][cOriginX]= 1;
+        // }
         
     }
     if (IsKeyPressed(KEY_LEFT)){
-        if (cOriginX-1 >= 0)
-        {
-            
-            table[cOriginY][cOriginX]= 0;
-            cOriginX--;
-            if(table[cOriginY][cOriginX]==2)
-            {
-              apilar(&body,cOriginX+1,cOriginY);  
-              FCont++;
-              food=false;
+        actualMovement=3;
+        // if (cOriginX-1 >= 0 && actualMovement != 3)
+        // {
+        //     actualMovement = 3;
+        //     table[cOriginY][cOriginX]= 0;
+        //     cOriginX--;
+        //     if(table[cOriginY][cOriginX]==2)
+        //     {
+        //       apilar(&body,cOriginX+1,cOriginY);  
+        //       FCont++;
+        //       food=false;
               
                     
-            }
-            table[cOriginY][cOriginX]= 1;
-        }
+        //     }
+        //     table[cOriginY][cOriginX]= 1;
+        // }
     }
 
 }
@@ -104,6 +119,80 @@ void deletebody(int tableY, int tableX, int cellSize){
             }
         }
 }
+void currentMovementForce(int currentMovement)
+{
+    switch (currentMovement)
+    {
+        case 1:
+        
+        if(cOriginY - 1 >= 0){
+            actualMovement = 1;
+            table[cOriginY][cOriginX]= 0;
+            cOriginY--;
+            if(table[cOriginY][cOriginX]==2)
+            {
+                apilar(&body,cOriginX,cOriginY+1);
+                FCont++;
+                food=false;       
+            }
+            table[cOriginY][cOriginX]= 1;
+        }
+        break;
+        case 2:
+          if(cOriginY+1 < TABLE_HEIGHT){
+            actualMovement = 2;
+            table[cOriginY][cOriginX]= 0;
+            cOriginY++;
+            if(table[cOriginY][cOriginX]==2)
+            {
+                apilar(&body, cOriginX, cOriginY-1);
+            
+                FCont++;
+                food=false;
+                    
+            }
+            table[cOriginY][cOriginX]= 1;
+        }
+
+        break;
+
+        case 3:
+            if (cOriginX-1 >= 0)
+        {
+            
+            table[cOriginY][cOriginX]= 0;
+            cOriginX--;
+            if(table[cOriginY][cOriginX]==2)
+            {
+              apilar(&body,cOriginX+1,cOriginY);  
+              FCont++;
+              food=false;
+              
+                    
+            }
+            table[cOriginY][cOriginX]= 1;
+        }
+        
+
+        break;
+
+        case 4:
+            if (cOriginX+1 < TABLE_WIDTH)
+            {
+                table[cOriginY][cOriginX]= 0;
+                cOriginX++;
+                if(table[cOriginY][cOriginX]==2)
+                {
+                    apilar(&body,cOriginX-1,cOriginY);
+                    FCont++;
+                    food=false;
+                }
+                table[cOriginY][cOriginX]= 1;
+            }
+
+        break;
+    }
+}
 
 int main(int argc, char const *argv[])
 {
@@ -113,23 +202,37 @@ int main(int argc, char const *argv[])
     const int SCREENHEIGHT = 800;
     const int cellSize = 50;
     // Probando borrar el cuerpo cada 0,5 segundos
-    float timerB = 0.0f;
-    
+    float timerCurrentMovement = 0.0f;
+    float timerMovementPermission = 0.0f;   
     
     inicializar(&body);
 
     InitWindow(SCREENWIDTH, SCREENHEIGHT, "SNAKERSSSSSS");
 
-    SetTargetFPS(24);
+    SetTargetFPS(60);
     
     while (!WindowShouldClose())
     {
         
-        BeginDrawing();
-        ClearBackground(BLACK);
-        float erasedbody = GetFrameTime();
-        timerB += erasedbody;
-        // Generacion aleatoria de comida
+        //Calculos
+        float deltatime = GetFrameTime();
+        timerCurrentMovement += deltatime;
+        timerMovementPermission += deltatime;
+
+
+        
+
+        UpdateTeclado();
+        if (timerCurrentMovement >= 0.23f)
+        {
+            currentMovementForce(actualMovement);
+            timerCurrentMovement = 0.0f;
+        }
+        
+        
+        
+
+        
         if(!food){
             fX = rand() % 10;
             fY = rand() % 10;
@@ -138,6 +241,11 @@ int main(int argc, char const *argv[])
             food = true;
         }
 
+        BeginDrawing();
+        ClearBackground(BLACK);
+           // Generacion aleatoria de comida
+       
+        //Dibujo
         // Calcular el tamano y posicion de la tabla total
         float tableWidth = cellSize * TABLE_WIDTH;
         float tableHeight = cellSize * TABLE_HEIGHT;
@@ -145,7 +253,7 @@ int main(int argc, char const *argv[])
         float tableY = (SCREENHEIGHT - tableHeight) * 0.5f;
         DrawRectangleLines(tableX, tableY, tableWidth, tableHeight, GREEN);
 
-        UpdateTeclado();
+        
         for (int i = 0; i < TABLE_HEIGHT; i++)
         {
             // Dibujar cada celda
@@ -171,11 +279,6 @@ int main(int argc, char const *argv[])
                     float centerY = tableY + i*cellSize + cellSize / 2;
                     DrawCircle(centerX, centerY, 12, RED);
                 }
-            }
-            if (timerB >=0.5f)
-            {
-                deletebody(tableY, tableX, cellSize);
-                timerB = 0.0f;
             }
             
             DrawBody();
