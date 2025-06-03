@@ -23,4 +23,5 @@ int apilar(Pila *p, int x, int y);
 int desapilar(Pila *p, ParEnteros *salida);
 int verTope(Pila *p, ParEnteros *salida);
 int tamanio(const Pila *p); 
+int desencolar(Pila *p, ParEnteros *salida);
 #endif

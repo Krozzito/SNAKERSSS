@@ -45,3 +45,18 @@ int verTope(Pila *p, ParEnteros *salida) {
     *salida = p->elementos[p->tope];
     return 1;
 }
+int desencolar(Pila *p, ParEnteros *salida) {
+    if (estaVacia(p)) {
+        return 0;
+    }
+
+    *salida = p->elementos[0]; // Extraer el más antiguo (la cola)
+
+    // Mover los demás hacia la izquierda
+    for (int i = 0; i < p->tope; i++) {
+        p->elementos[i] = p->elementos[i + 1];
+    }
+
+    p->tope--;
+    return 1;
+}
