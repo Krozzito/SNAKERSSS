@@ -3,6 +3,7 @@
 #include <raylib.h>
 #include <time.h>
 #include "pila.h"
+#include <math.h>
 
 #define TABLE_WIDTH 10
 #define TABLE_HEIGHT 10
@@ -40,8 +41,9 @@ void UpdateTeclado()
         actualMovement = 4;
 }
 
-int gameOver(){
-    while(!WindowShouldClose())
+int gameOver()
+{
+    while (!WindowShouldClose())
     {
 
         BeginDrawing();
@@ -51,13 +53,35 @@ int gameOver(){
         {
             return 0;
         }
-        
     }
-    CloseWindow();    
+    CloseWindow();
 };
 
+void DrawRotatedTriangle(Vector2 center, float size, float angle, Color color)
+{
+    // Puntos en coordenadas locales (equilátero)
+    Vector2 p1 = {0, -size};
+    Vector2 p2 = {-size * 0.866f, size * 0.5f};   // 60° rotado
+    Vector2 p3 = {size * 0.866f, size * 0.5f};
 
+    // Rotar cada punto respecto al centro
+    float cosA = cosf(angle);
+    float sinA = sinf(angle);
 
+    Vector2 rp1 = {
+        center.x + p1.x * cosA - p1.y * sinA,
+        center.y + p1.x * sinA + p1.y * cosA};
+
+    Vector2 rp2 = {
+        center.x + p2.x * cosA - p2.y * sinA,
+        center.y + p2.x * sinA + p2.y * cosA};
+
+    Vector2 rp3 = {
+        center.x + p3.x * cosA - p3.y * sinA,
+        center.y + p3.x * sinA + p3.y * cosA};
+
+    DrawTriangle(rp1, rp2, rp3, color);
+}
 
 
 void currentMovementForce(int currentMovement)
@@ -65,6 +89,9 @@ void currentMovementForce(int currentMovement)
     switch (currentMovement)
     {
     case 1:
+
+        if (cOriginY - 1 < 0)
+            gameOver();
 
         if (cOriginY - 1 >= 0)
         {
@@ -74,7 +101,8 @@ void currentMovementForce(int currentMovement)
             int prevY = cOriginY;
 
             cOriginY--;
-            if(table[cOriginY][cOriginX] == 1) gameOver();
+            if (table[cOriginY][cOriginX] == 1)
+                gameOver();
             if (table[cOriginY][cOriginX] == 2)
             {
                 apilar(&body, prevX, prevY);
@@ -93,6 +121,9 @@ void currentMovementForce(int currentMovement)
         }
         break;
     case 2:
+        if (cOriginY + 1 >= TABLE_HEIGHT)
+            gameOver();
+
         if (cOriginY + 1 < TABLE_HEIGHT)
         {
             actualMovement = 2;
@@ -101,7 +132,8 @@ void currentMovementForce(int currentMovement)
             int prevY = cOriginY;
 
             cOriginY++;
-            if(table[cOriginY][cOriginX] == 1) gameOver();
+            if (table[cOriginY][cOriginX] == 1)
+                gameOver();
             if (table[cOriginY][cOriginX] == 2)
             {
                 apilar(&body, prevX, prevY);
@@ -121,6 +153,8 @@ void currentMovementForce(int currentMovement)
         break;
 
     case 3:
+        if (cOriginX - 1 < 0)
+            gameOver();
         if (cOriginX - 1 >= 0)
         {
 
@@ -130,7 +164,8 @@ void currentMovementForce(int currentMovement)
             int prevY = cOriginY;
 
             cOriginX--;
-            if(table[cOriginY][cOriginX] == 1) gameOver();
+            if (table[cOriginY][cOriginX] == 1)
+                gameOver();
             if (table[cOriginY][cOriginX] == 2)
             {
                 apilar(&body, prevX, prevY);
@@ -151,6 +186,9 @@ void currentMovementForce(int currentMovement)
         break;
 
     case 4:
+
+        if (cOriginX + 1 >= TABLE_WIDTH)
+            gameOver();
         if (cOriginX + 1 < TABLE_WIDTH)
         {
             actualMovement = 4;
@@ -159,7 +197,8 @@ void currentMovementForce(int currentMovement)
             int prevY = cOriginY;
 
             cOriginX++;
-            if(table[cOriginY][cOriginX] == 1) gameOver();
+            if (table[cOriginY][cOriginX] == 1)
+                gameOver();
             if (table[cOriginY][cOriginX] == 2)
             {
                 apilar(&body, prevX, prevY);
@@ -180,7 +219,9 @@ void currentMovementForce(int currentMovement)
         break;
     }
 }
-
+void startGame(){
+    
+}
 int main(int argc, char const *argv[])
 {
 
@@ -244,17 +285,54 @@ int main(int argc, char const *argv[])
             {
                 // Rectangle cell = {(SCREENWIDTH / 2) + ((j - TABLE_WIDTH / 2) * cellSize), SCREENHEIGHT / 2 + ((i - TABLE_HEIGHT / 2) * cellSize), cellSize, cellSize};
 
+                if((i+j)%2 == 0) DrawRectangle(tableX + j * cellSize, tableY + i * cellSize, cellSize, cellSize, BLUE);
+                if((i+j)%2 != 0) DrawRectangle(tableX + j * cellSize, tableY + i * cellSize, cellSize, cellSize, BLACK);
                 // Definir el origen de la tabla (punto superior izq), calculado anteriormente
                 Rectangle cell = {tableX + j * cellSize, tableY + i * cellSize, cellSize, cellSize};
                 DrawRectangleLinesEx(cell, 1, WHITE);
-
+            
                 // Dibujar circulo en el centro de los rectangulos
+                // if (table[i][j] == 1)
+                // {
+
+                //     float centerX = tableX + j * cellSize + cellSize / 2;
+                //     float centerY = tableY + i * cellSize + cellSize / 2;
+                //     DrawCircle(centerX, centerY, 20, GREEN);
+                // }
                 if (table[i][j] == 1)
                 {
-
                     float centerX = tableX + j * cellSize + cellSize / 2;
                     float centerY = tableY + i * cellSize + cellSize / 2;
-                    DrawCircle(centerX, centerY, 20, GREEN);
+
+                    if (i == cOriginY && j == cOriginX)
+                    {
+                        // Es la cabeza → dibujar triángulo con orientación
+                        float angle = 0.0f;
+
+                        switch (actualMovement)
+                        {
+                        case 3:
+                            angle = -PI / 2;
+                            break; // arriba
+                        case 4:
+                            angle = PI / 2;
+                            break; // abajo
+                        case 2:
+                            angle = PI;
+                            break; // izquierda
+                        case 1:
+                            angle = 0.0f;
+                            break; // derecha
+                        }
+
+                        Vector2 center = {centerX, centerY};
+                        DrawRotatedTriangle(center, 20, angle, WHITE);
+                    }
+                    else
+                    {
+                        // Dibujar cuerpo como círculos
+                        DrawCircle(centerX, centerY, 20, YELLOW);
+                    }
                 }
                 // Dibujar comida
                 if (table[i][j] == 2)
@@ -269,7 +347,6 @@ int main(int argc, char const *argv[])
             char t[64];
             sprintf(t, "POINTS: %d", FCont);
             DrawText(t, 100, 100, 30, GREEN);
-
             // Lineas de ejes
             // DrawLine(SCREENWIDTH / 2, 0, SCREENWIDTH / 2, SCREENHEIGHT, RED);
             // DrawLine(0, SCREENHEIGHT / 2, SCREENWIDTH, SCREENHEIGHT / 2, RED);
